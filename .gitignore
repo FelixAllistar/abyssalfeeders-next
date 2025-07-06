@@ -39,3 +39,28 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+leaderboard.db
+leaderboard.db-shm
+leaderboard.db-wal
+
+# pnpm workspace artifacts
+pnpm-workspace.yaml
+
+# Docker
+.dockerignore
+Dockerfile*
+docker-compose*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db

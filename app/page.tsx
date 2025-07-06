@@ -1,103 +1,137 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { CharacterSearch } from "@/components/CharacterSearch";
+import { CharacterIdInput } from "@/components/CharacterIdInput";
+import { Leaderboard } from "@/components/Leaderboard";
+import { ProcessingStatus } from "@/components/ProcessingStatus";
+
+interface Character {
+  id: number;
+  name: string;
+}
+
+interface ProcessingResult {
+  characterId: number;
+  characterName: string;
+  totalValue: number;
+  killmailCount: number;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingResult, setProcessingResult] = useState<ProcessingResult | undefined>();
+  const [processingError, setProcessingError] = useState<string | undefined>();
+  const [leaderboardRefresh, setLeaderboardRefresh] = useState(0);
+  const [searchMethod, setSearchMethod] = useState<'search' | 'id'>('search');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const processCharacter = async (character: Character) => {
+    setIsProcessing(true);
+    setProcessingResult(undefined);
+    setProcessingError(undefined);
+
+    try {
+      const response = await fetch('/api/process-character', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          characterId: character.id,
+          characterName: character.name,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to process character');
+      }
+
+      const result = await response.json();
+      setProcessingResult(result);
+      setLeaderboardRefresh(prev => prev + 1);
+    } catch (error) {
+      console.error('Processing failed:', error);
+      setProcessingError(error instanceof Error ? error.message : 'Unknown error occurred');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-4 relative z-10 min-h-screen flex flex-col">
+      <div className="text-center mb-6">
+        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+          Abyssal Feeders
+        </h1>
+        <p className="text-muted-foreground">
+          Track EVE Online character killmail values in abyssal space
+        </p>
+        <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mt-2" />
+      </div>
+
+      <div className="flex-1 grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-1">
+          <Card className="bg-card/80 backdrop-blur-sm border-border/50 shadow-2xl shadow-primary/10 hover:shadow-primary/20 transition-all duration-300 h-fit">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/8 to-primary/3 rounded-lg pointer-events-none" />
+            <CardHeader className="relative">
+              <CardTitle className="flex items-center gap-4">
+                <span className="text-foreground">Add Character</span>
+                <div className="flex bg-muted/50 rounded-lg p-1 backdrop-blur-sm">
+                  <Button
+                    variant={searchMethod === 'search' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setSearchMethod('search')}
+                    disabled={isProcessing}
+                    className="relative overflow-hidden"
+                  >
+                    <span className="relative z-10">Search</span>
+                    {searchMethod === 'search' && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/70 opacity-80" />
+                    )}
+                  </Button>
+                  <Button
+                    variant={searchMethod === 'id' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setSearchMethod('id')}
+                    disabled={isProcessing}
+                    className="relative overflow-hidden"
+                  >
+                    <span className="relative z-10">ID</span>
+                    {searchMethod === 'id' && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/70 opacity-80" />
+                    )}
+                  </Button>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 relative">
+              {searchMethod === 'search' ? (
+                <CharacterSearch 
+                  onCharacterSelect={processCharacter}
+                  isProcessing={isProcessing}
+                />
+              ) : (
+                <CharacterIdInput 
+                  onCharacterLookup={processCharacter}
+                  isProcessing={isProcessing}
+                />
+              )}
+              
+              <ProcessingStatus 
+                isProcessing={isProcessing}
+                result={processingResult}
+                error={processingError}
+              />
+            </CardContent>
+          </Card>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="xl:col-span-2">
+          <Leaderboard refreshTrigger={leaderboardRefresh} />
+        </div>
+      </div>
     </div>
   );
 }
