@@ -179,7 +179,32 @@ body::before {
     radial-gradient(0.5px 0.5px at 45% 25%, rgba(255, 255, 255, 0.3), transparent),
     radial-gradient(0.5px 0.5px at 65% 90%, rgba(255, 255, 255, 0.5), transparent),
     radial-gradient(0.5px 0.5px at 85% 15%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(0.5px 0.5px at 95% 45%, rgba(255, 255, 255, 0.4), transparent);
+    radial-gradient(0.5px 0.5px at 95% 45%, rgba(255, 255, 255, 0.4), transparent),
+    /* More dense star field */
+    radial-gradient(0.5px 0.5px at 10% 70%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 17% 32%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(0.5px 0.5px at 26% 48%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 33% 73%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(0.5px 0.5px at 41% 18%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 49% 92%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(0.5px 0.5px at 57% 38%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 64% 63%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(0.5px 0.5px at 73% 28%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 81% 88%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(0.5px 0.5px at 89% 52%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 97% 77%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(0.5px 0.5px at 6% 22%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 14% 58%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(0.5px 0.5px at 31% 83%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 39% 13%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(0.5px 0.5px at 46% 67%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 53% 42%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(0.5px 0.5px at 61% 98%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 68% 27%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(0.5px 0.5px at 76% 72%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 84% 47%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(0.5px 0.5px at 91% 12%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 3% 87%, rgba(255, 255, 255, 0.6), transparent);
   animation: starfield 120s linear infinite;
   pointer-events: none;
 }

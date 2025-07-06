@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,7 @@ export function CharacterSearch({ onCharacterSelect, isProcessing }: CharacterSe
   const [searchResults, setSearchResults] = useState<Character[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Debounced search function
   const debouncedSearch = useCallback(
@@ -71,20 +72,34 @@ export function CharacterSearch({ onCharacterSelect, isProcessing }: CharacterSe
     }
   }, [searchTerm, debouncedSearch]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const handleCharacterSelect = (character: Character) => {
     setSearchTerm(character.name);
     setShowResults(false);
+    setSearchResults([]);
     onCharacterSelect(character);
   };
 
   return (
-    <div className="relative w-full max-w-md">
+    <div ref={containerRef} className="relative w-full max-w-md">
       <div className="space-y-2">
         <Input
           type="text"
           placeholder="Search character name..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm(e.target.value.trim())}
           disabled={isProcessing}
           className="w-full"
         />

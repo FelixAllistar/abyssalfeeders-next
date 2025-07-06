@@ -72,7 +72,7 @@ export function CharacterIdInput({ onCharacterLookup, isProcessing }: CharacterI
           type="number"
           placeholder="Enter character ID..."
           value={characterId}
-          onChange={(e) => setCharacterId(e.target.value)}
+          onChange={(e) => setCharacterId(e.target.value.trim())}
           onKeyPress={handleKeyPress}
           disabled={isProcessing || isLookingUp}
           className="flex-1"
