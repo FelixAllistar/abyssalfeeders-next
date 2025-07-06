@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -20,21 +20,19 @@ export function CharacterSearch({ onCharacterSelect, isProcessing }: CharacterSe
   const [showResults, setShowResults] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Debounced search function
-  const debouncedSearch = useCallback(
-    (() => {
-      let timeoutId: NodeJS.Timeout;
-      return (term: string) => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => searchCharacters(term), 300);
-      };
-    })(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
+  // Manual search function
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      searchCharacters(searchTerm);
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
+    }
+  };
 
   const searchCharacters = async (term: string) => {
-    if (term.length < 3) {
+    const trimmedTerm = term.trim();
+    if (trimmedTerm.length < 3) {
       setSearchResults([]);
       setShowResults(false);
       return;
@@ -47,7 +45,7 @@ export function CharacterSearch({ onCharacterSelect, isProcessing }: CharacterSe
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: term }),
+        body: JSON.stringify({ name: trimmedTerm }),
       });
 
       const data = await response.json();
@@ -63,14 +61,18 @@ export function CharacterSearch({ onCharacterSelect, isProcessing }: CharacterSe
     }
   };
 
-  useEffect(() => {
-    if (searchTerm) {
-      debouncedSearch(searchTerm);
-    } else {
-      setSearchResults([]);
-      setShowResults(false);
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
-  }, [searchTerm, debouncedSearch]);
+  };
+
+  useEffect(() => {
+    if (isProcessing) {
+      setShowResults(false);
+      setSearchResults([]);
+    }
+  }, [isProcessing]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,9 +88,10 @@ export function CharacterSearch({ onCharacterSelect, isProcessing }: CharacterSe
   }, []);
 
   const handleCharacterSelect = (character: Character) => {
-    setSearchTerm(character.name);
+    setSearchTerm("");
     setShowResults(false);
     setSearchResults([]);
+    setIsSearching(false);
     onCharacterSelect(character);
   };
 
@@ -97,9 +100,10 @@ export function CharacterSearch({ onCharacterSelect, isProcessing }: CharacterSe
       <div className="space-y-2">
         <Input
           type="text"
-          placeholder="Search character name..."
+          placeholder="Search character name... (Press Enter to search)"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value.trim())}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyPress={handleKeyPress}
           disabled={isProcessing}
           className="w-full"
         />
