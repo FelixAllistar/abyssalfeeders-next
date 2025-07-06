@@ -14,11 +14,12 @@ export async function GET(
     }
 
     const db = getDatabase();
-    const stmt = db.prepare(`
-      SELECT image_data, image_content_type, image_fetched_at
-      FROM leaderboard WHERE character_id = ?
-    `);
-    const result = stmt.get(characterId) as { 
+    const result = await db.execute({
+      sql: `SELECT image_data, image_content_type, image_fetched_at
+            FROM leaderboard WHERE character_id = ?`,
+      args: [characterId]
+    });
+    const row = result.rows[0] as unknown as { 
       image_data: Buffer | null, 
       image_content_type: string | null, 
       image_fetched_at: string | null 
@@ -29,12 +30,12 @@ export async function GET(
 
     let needsFetch = false;
 
-    if (!result || !result.image_data || !result.image_fetched_at || new Date(result.image_fetched_at) < sevenDaysAgo) {
+    if (!row || !row.image_data || !row.image_fetched_at || new Date(row.image_fetched_at) < sevenDaysAgo) {
       needsFetch = true;
     }
 
-    let imageData = result?.image_data || null;
-    let contentType = result?.image_content_type || null;
+    let imageData = row?.image_data || null;
+    let contentType = row?.image_content_type || null;
 
     // If we need to fetch or refresh the image
     if (needsFetch) {
@@ -48,25 +49,24 @@ export async function GET(
           contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
 
           // Update the database with new image data
-          const updateStmt = db.prepare(`
-            UPDATE leaderboard
-            SET image_data = ?, image_content_type = ?, image_fetched_at = datetime('now')
-            WHERE character_id = ?
-          `);
-
-          updateStmt.run(imageData, contentType, characterId);
+          await db.execute({
+            sql: `UPDATE leaderboard
+                  SET image_data = ?, image_content_type = ?, image_fetched_at = datetime('now')
+                  WHERE character_id = ?`,
+            args: [imageData, contentType, characterId]
+          });
           console.log(`Refreshed portrait for character ${characterId}`);
         } else {
           console.warn(`Failed to fetch portrait for character ${characterId}: ${imageResponse.status}`);
           // If fetch fails and we have old cached data, use it if available
-          if (!result?.image_data) {
+          if (!row?.image_data) {
             return new NextResponse("Character portrait not found", { status: 404 });
           }
         }
       } catch (fetchError) {
         console.warn(`Error fetching portrait for character ${characterId}:`, fetchError);
         // If fetch fails and we have old cached data, use it if available
-        if (!result?.image_data) {
+        if (!row?.image_data) {
           return new NextResponse("Failed to fetch character portrait", { status: 500 });
         }
       }

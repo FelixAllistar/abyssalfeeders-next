@@ -57,17 +57,17 @@ export async function POST(request: NextRequest) {
     }
 
     const db = getDatabase();
-    const stmt = db.prepare(`
-      INSERT INTO leaderboard (character_id, character_name, total_value, last_updated, image_data, image_content_type, image_fetched_at)
-      VALUES (?, ?, ?, datetime('now'), ?, ?, ?)
-      ON CONFLICT(character_id) DO UPDATE SET
-      total_value = excluded.total_value,
-      last_updated = excluded.last_updated,
-      image_data = excluded.image_data,
-      image_content_type = excluded.image_content_type,
-      image_fetched_at = excluded.image_fetched_at
-    `);
-    stmt.run(characterId, characterName, totalValue, imageData, imageContentType, imageFetchedAt);
+    await db.execute({
+      sql: `INSERT INTO leaderboard (character_id, character_name, total_value, last_updated, image_data, image_content_type, image_fetched_at)
+            VALUES (?, ?, ?, datetime('now'), ?, ?, ?)
+            ON CONFLICT(character_id) DO UPDATE SET
+            total_value = excluded.total_value,
+            last_updated = excluded.last_updated,
+            image_data = excluded.image_data,
+            image_content_type = excluded.image_content_type,
+            image_fetched_at = excluded.image_fetched_at`,
+      args: [characterId, characterName, totalValue, imageData, imageContentType, imageFetchedAt]
+    });
 
     return NextResponse.json({
       characterId,

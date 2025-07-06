@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3';
+import { createClient, type Client } from '@libsql/client';
 import path from 'path';
 import fs from 'fs';
 
@@ -27,7 +27,7 @@ const getDbPath = () => {
   return path.join(process.cwd(), 'leaderboard.db');
 };
 
-let db: Database.Database | null = null;
+let db: Client | null = null;
 
 export function getDatabase() {
   if (!db) {
@@ -35,10 +35,12 @@ export function getDatabase() {
     console.log(`Database path: ${dbPath}`);
 
     // Initialize SQLite database
-    db = new Database(dbPath);
+    db = createClient({
+      url: `file:${dbPath}`
+    });
 
     // Create leaderboard table and add columns if they don't exist
-    db.exec(`
+    db.execute(`
       CREATE TABLE IF NOT EXISTS leaderboard (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         character_id INTEGER UNIQUE,
@@ -54,7 +56,7 @@ export function getDatabase() {
     console.log("Database initialized successfully");
 
     // Enable WAL mode for better concurrency
-    db.pragma('journal_mode = WAL');
+    db.execute('PRAGMA journal_mode = WAL');
 
     // Close database on process exit
     process.on('SIGINT', () => {
