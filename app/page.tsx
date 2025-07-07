@@ -71,42 +71,36 @@ export default function Home() {
         <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mt-2" />
       </div>
 
-      <div className="flex-1 grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-1">
-          <Card className="bg-card/80 backdrop-blur-sm border-border/50 shadow-2xl shadow-primary/10 hover:shadow-primary/20 transition-all duration-300 h-fit">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/8 to-primary/3 rounded-lg pointer-events-none" />
-            <CardHeader className="relative">
-              <CardTitle className="flex items-center gap-4">
-                <span className="text-foreground">Add Character</span>
-                <div className="flex bg-muted/50 rounded-lg p-1 backdrop-blur-sm">
-                  <Button
-                    variant={searchMethod === 'search' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setSearchMethod('search')}
-                    disabled={isProcessing}
-                    className="relative overflow-hidden"
-                  >
-                    <span className="relative z-10">Search</span>
-                    {searchMethod === 'search' && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/70 opacity-80" />
-                    )}
-                  </Button>
-                  <Button
-                    variant={searchMethod === 'id' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setSearchMethod('id')}
-                    disabled={isProcessing}
-                    className="relative overflow-hidden"
-                  >
-                    <span className="relative z-10">ID</span>
-                    {searchMethod === 'id' && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/70 opacity-80" />
-                    )}
-                  </Button>
-                </div>
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-4 gap-6">
+        {/* Search Column - Smaller and more subtle */}
+        <div className="lg:col-span-1 xl:col-span-1">
+          <Card className="bg-card/40 backdrop-blur-sm border-border/30 shadow-lg transition-all duration-300 h-fit">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Add Character
               </CardTitle>
+              <div className="flex bg-muted/30 rounded-md p-0.5">
+                <Button
+                  variant={searchMethod === 'search' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setSearchMethod('search')}
+                  disabled={isProcessing}
+                  className="h-7 text-xs"
+                >
+                  Search
+                </Button>
+                <Button
+                  variant={searchMethod === 'id' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setSearchMethod('id')}
+                  disabled={isProcessing}
+                  className="h-7 text-xs"
+                >
+                  ID
+                </Button>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4 relative">
+            <CardContent className="pt-0">
               {searchMethod === 'search' ? (
                 <CharacterSearch 
                   onCharacterSelect={processCharacter}
@@ -119,16 +113,20 @@ export default function Home() {
                 />
               )}
               
-              <ProcessingStatus 
-                isProcessing={isProcessing}
-                result={processingResult}
-                error={processingError}
-              />
+              {/* Compact processing status within search card */}
+              <div className="mt-3">
+                <ProcessingStatus 
+                  isProcessing={isProcessing}
+                  result={processingResult}
+                  error={processingError}
+                />
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="xl:col-span-2">
+        {/* Leaderboard Column - Main focus, takes up most space */}
+        <div className="lg:col-span-3 xl:col-span-3">
           <Leaderboard refreshTrigger={leaderboardRefresh} />
         </div>
       </div>
