@@ -135,9 +135,6 @@ export function Leaderboard({ refreshTrigger }: LeaderboardProps) {
                 </div>
                 <div>
                   <div className="font-medium text-foreground text-eve-label">{entry.character_name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    ID: {entry.character_id}
-                  </div>
                 </div>
               </div>
               <div className="text-right relative z-10">
