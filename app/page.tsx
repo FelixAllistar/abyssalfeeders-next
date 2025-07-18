@@ -63,11 +63,8 @@ export default function Home() {
     <div className="container mx-auto p-4 relative z-10 min-h-screen flex flex-col">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent text-eve-title">
-          Abyssal Feeders
+          Abyssal Feederboard
         </h1>
-        <p className="text-muted-foreground text-sm">
-          Track EVE Online character killmail values in abyssal space
-        </p>
         <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mt-2" />
       </div>
 
@@ -79,26 +76,29 @@ export default function Home() {
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Add Character
               </CardTitle>
-              <div className="flex bg-muted/30 rounded-md p-0.5">
+              <div className="flex bg-muted/30 rounded-md p-0.5 w-fit">
                 <Button
                   variant={searchMethod === 'search' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setSearchMethod('search')}
                   disabled={isProcessing}
-                  className="h-7 text-xs"
+                  className="h-7 text-xs flex-1 rounded-r-none"
                 >
-                  Search
+                  Name
                 </Button>
                 <Button
                   variant={searchMethod === 'id' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setSearchMethod('id')}
                   disabled={isProcessing}
-                  className="h-7 text-xs"
+                  className="h-7 text-xs flex-1 rounded-l-none"
                 >
                   ID
                 </Button>
               </div>
+              <p className="text-xs text-muted-foreground/70 mt-2">
+                Note: Only pulls kills from Characters who have been authenticated on Zkillboard.com
+              </p>
             </CardHeader>
             <CardContent className="pt-0">
               {searchMethod === 'search' ? (
