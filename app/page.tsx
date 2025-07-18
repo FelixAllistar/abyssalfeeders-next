@@ -45,7 +45,11 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to process character');
+        const errorData = await response.json();
+        if (response.status === 400 && errorData.error === "Character has no abyssal killmail value") {
+          throw new Error('No kills found, please auth on ZKillboard first.');
+        }
+        throw new Error(errorData.error || 'Failed to process character');
       }
 
       const result = await response.json();
