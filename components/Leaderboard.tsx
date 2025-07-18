@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface LeaderboardEntry {
   character_id: number;
@@ -64,7 +65,7 @@ export function Leaderboard({ refreshTrigger }: LeaderboardProps) {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-center text-foreground">Feederboard</h2>
+        <h2 className="text-2xl font-bold text-center text-foreground text-eve-heading">Feederboard</h2>
         <div className="text-center py-8">
           <div className="animate-pulse">Loading leaderboard...</div>
         </div>
@@ -75,7 +76,7 @@ export function Leaderboard({ refreshTrigger }: LeaderboardProps) {
   if (error) {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-center text-foreground">Feederboard</h2>
+        <h2 className="text-2xl font-bold text-center text-foreground text-eve-heading">Feederboard</h2>
         <div className="text-center py-8">
           <div className="text-destructive mb-4">{error}</div>
           <Button onClick={fetchLeaderboard} variant="outline" className="border-border/50 hover:bg-primary/10">
@@ -120,9 +121,11 @@ export function Leaderboard({ refreshTrigger }: LeaderboardProps) {
                   index === 2 ? 'border-purple-500/50' :
                   'border-primary/30'
                 }`}>
-                  <img
+                  <Image
                     src={`/api/character-image/${entry.character_id}`}
                     alt={`${entry.character_name} portrait`}
+                    width={64}
+                    height={64}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       // Replace failed image with placeholder
@@ -136,14 +139,14 @@ export function Leaderboard({ refreshTrigger }: LeaderboardProps) {
                   </div>
                 </div>
                 <div>
-                  <div className="font-medium text-foreground">{entry.character_name}</div>
+                  <div className="font-medium text-foreground text-eve-label">{entry.character_name}</div>
                   <div className="text-sm text-muted-foreground">
                     ID: {entry.character_id}
                   </div>
                 </div>
               </div>
               <div className="text-right relative z-10">
-                <div className="font-bold text-lg text-primary">
+                <div className="font-bold text-lg text-primary text-eve-value">
                   {formatValue(entry.total_value)} ISK
                 </div>
                 <div className="text-sm text-muted-foreground">

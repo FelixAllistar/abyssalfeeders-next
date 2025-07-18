@@ -62,10 +62,10 @@ export default function Home() {
   return (
     <div className="container mx-auto p-4 relative z-10 min-h-screen flex flex-col">
       <div className="text-center mb-6">
-        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent text-eve-title">
           Abyssal Feeders
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Track EVE Online character killmail values in abyssal space
         </p>
         <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mt-2" />

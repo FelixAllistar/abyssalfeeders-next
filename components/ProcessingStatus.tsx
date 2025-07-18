@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface ProcessingResult {
@@ -53,7 +52,7 @@ export function ProcessingStatus({ isProcessing, result, error }: ProcessingStat
             </div>
             
             <div className="text-xs text-muted-foreground">
-              {result.characterName}: {formatValue(result.totalValue)} ISK ({result.killmailCount} kills)
+              <span className="text-eve-label">{result.characterName}</span>: <span className="text-eve-value">{formatValue(result.totalValue)} ISK</span> ({result.killmailCount} kills)
             </div>
           </div>
         )}
