@@ -40,6 +40,14 @@ export async function POST(request: NextRequest) {
 
     const totalValue = allKillmails.reduce((sum, killmail) => sum + (killmail.zkb?.totalValue || 0), 0);
 
+    // Reject characters with zero killmail value
+    if (totalValue === 0) {
+      return NextResponse.json(
+        { error: "Character has no abyssal killmail value" },
+        { status: 400 }
+      );
+    }
+
     // Fetch and cache character portrait
     let imageData = null;
     let imageContentType = null;
