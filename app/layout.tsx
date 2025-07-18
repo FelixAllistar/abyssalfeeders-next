@@ -14,8 +14,8 @@ const orbitron = Orbitron({
 });
 
 export const metadata: Metadata = {
-  title: "Abyssal Feeders - EVE Online Killmail Tracker",
-  description: "Track EVE Online character killmail values in abyssal space",
+  title: "Abyssal Feederboard",
+  description: "You really dont want first place",
 };
 
 export default function RootLayout({

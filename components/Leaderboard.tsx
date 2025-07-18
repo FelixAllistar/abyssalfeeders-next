@@ -65,7 +65,6 @@ export function Leaderboard({ refreshTrigger }: LeaderboardProps) {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-center text-foreground text-eve-heading">Feederboard</h2>
         <div className="text-center py-8">
           <div className="animate-pulse">Loading leaderboard...</div>
         </div>
@@ -76,7 +75,6 @@ export function Leaderboard({ refreshTrigger }: LeaderboardProps) {
   if (error) {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-center text-foreground text-eve-heading">Feederboard</h2>
         <div className="text-center py-8">
           <div className="text-destructive mb-4">{error}</div>
           <Button onClick={fetchLeaderboard} variant="outline" className="border-border/50 hover:bg-primary/10">
@@ -89,7 +87,6 @@ export function Leaderboard({ refreshTrigger }: LeaderboardProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-center text-foreground">Feederboard</h2>
       {leaderboard.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
           No characters processed yet. Add a character to get started!
@@ -99,12 +96,11 @@ export function Leaderboard({ refreshTrigger }: LeaderboardProps) {
           {leaderboard.map((entry, index) => (
             <div
               key={entry.character_id}
-              className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-300 relative overflow-hidden ${
-                index === 0 ? 'bg-accent/10 border-accent/30 hover:bg-accent/15 hover:border-accent/40' :
+              className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-300 relative overflow-hidden ${index === 0 ? 'bg-accent/10 border-accent/30 hover:bg-accent/15 hover:border-accent/40' :
                 index === 1 ? 'bg-primary/10 border-primary/30 hover:bg-primary/15 hover:border-primary/40' :
-                index === 2 ? 'bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/15 hover:border-purple-500/40' :
-                'bg-muted/20 border-border/30 hover:bg-muted/30 hover:border-primary/20'
-              }`}
+                  index === 2 ? 'bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/15 hover:border-purple-500/40' :
+                    'bg-muted/20 border-border/30 hover:bg-muted/30 hover:border-primary/20'
+                }`}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-primary/8 to-primary/4 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               <div className="flex items-center gap-3 relative z-10">
@@ -115,12 +111,11 @@ export function Leaderboard({ refreshTrigger }: LeaderboardProps) {
                   }`}>
                   {index + 1}
                 </div>
-                <div className={`w-16 h-16 rounded-full overflow-hidden border-2 bg-muted flex items-center justify-center shadow-lg ${
-                  index === 0 ? 'border-accent/50' :
+                <div className={`w-16 h-16 rounded-full overflow-hidden border-2 bg-muted flex items-center justify-center shadow-lg ${index === 0 ? 'border-accent/50' :
                   index === 1 ? 'border-primary/50' :
-                  index === 2 ? 'border-purple-500/50' :
-                  'border-primary/30'
-                }`}>
+                    index === 2 ? 'border-purple-500/50' :
+                      'border-primary/30'
+                  }`}>
                   <Image
                     src={`/api/character-image/${entry.character_id}`}
                     alt={`${entry.character_name} portrait`}

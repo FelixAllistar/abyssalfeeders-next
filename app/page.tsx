@@ -61,7 +61,7 @@ export default function Home() {
 
   return (
     <div className="container mx-auto p-4 relative z-10 min-h-screen flex flex-col">
-      <div className="text-center mb-6">
+      <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent text-eve-title">
           Abyssal Feeders
         </h1>
@@ -71,7 +71,7 @@ export default function Home() {
         <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mt-2" />
       </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-4 gap-6">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
         {/* Search Column - Smaller and more subtle */}
         <div className="lg:col-span-1 xl:col-span-1">
           <Card className="bg-card/40 backdrop-blur-sm border-border/30 shadow-lg transition-all duration-300 h-fit">
@@ -102,20 +102,20 @@ export default function Home() {
             </CardHeader>
             <CardContent className="pt-0">
               {searchMethod === 'search' ? (
-                <CharacterSearch 
+                <CharacterSearch
                   onCharacterSelect={processCharacter}
                   isProcessing={isProcessing}
                 />
               ) : (
-                <CharacterIdInput 
+                <CharacterIdInput
                   onCharacterLookup={processCharacter}
                   isProcessing={isProcessing}
                 />
               )}
-              
+
               {/* Compact processing status within search card */}
               <div className="mt-3">
-                <ProcessingStatus 
+                <ProcessingStatus
                   isProcessing={isProcessing}
                   result={processingResult}
                   error={processingError}
