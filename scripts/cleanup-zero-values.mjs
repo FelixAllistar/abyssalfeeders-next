@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+import { createClient } from '@libsql/client';
+import fs from 'fs';
+
 // Database path configuration - same logic as in database.ts
 const getDbPath = () => {
   if (process.env.DATABASE_PATH) {
