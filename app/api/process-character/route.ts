@@ -1,44 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/database';
+import { getCharacterAbyssalKills } from '@/lib/zkillboard';
 
 export async function POST(request: NextRequest) {
   try {
     const { characterId, characterName } = await request.json();
 
     // Fetch killmail data from Zkillboard with pagination
-    const allKillmails = [];
-    let page = 1;
-    let hasMorePages = true;
-
-    while (hasMorePages) {
-      const url = `https://zkillboard.com/api/characterID/${characterId}/abyssal/page/${page}/`;
-      console.log(`Fetching page ${page} from: ${url}`);
-
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': 'Abyssal Feeders - Felix Allistar <felixallistar@gmail.com>',
-          'Accept-Encoding': 'gzip',
-          'Accept': 'application/json',
-        }
-      });
-
-      if (!response.ok) {
-        console.warn(`Failed to fetch page ${page}: ${response.status}`);
-        break;
-      }
-
-      const pageKillmails = await response.json();
-
-      if (pageKillmails.length === 0 || pageKillmails.length < 200) {
-        allKillmails.push(...pageKillmails);
-        hasMorePages = false;
-      } else {
-        allKillmails.push(...pageKillmails);
-        page++;
-      }
-    }
-
-    const totalValue = allKillmails.reduce((sum, killmail) => sum + (killmail.zkb?.totalValue || 0), 0);
+    const { totalValue, killmailCount } = await getCharacterAbyssalKills(characterId);
 
     // Reject characters with zero killmail value
     if (totalValue === 0) {
@@ -81,7 +50,7 @@ export async function POST(request: NextRequest) {
       characterId,
       characterName,
       totalValue,
-      killmailCount: allKillmails.length,
+      killmailCount,
     });
 
   } catch (error) {
