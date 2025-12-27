@@ -4,7 +4,8 @@ import { updateAllCharacters } from '@/lib/update-service';
 // This route is intended to be called by a cron job service (e.g., Vercel Cron)
 // It triggers a full update of all characters in the leaderboard.
 export async function GET(request: Request) {
-  // Check for authorization header if needed (optional for now, but good practice)
+  // Check for authorization header if CRON_SECRET is set
+  // If CRON_SECRET is not set in environment variables, this check is skipped (endpoint is open)
   const authHeader = request.headers.get('authorization');
   if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new NextResponse('Unauthorized', { status: 401 });
