@@ -18,17 +18,8 @@ export async function updateAllCharacters() {
 
     let updatedCount = 0;
     let errorCount = 0;
-    const startTime = Date.now();
-    // Vercel execution timeout safety buffer (e.g. 50 seconds max execution time)
-    const MAX_EXECUTION_TIME = 50 * 1000;
 
     for (const char of characters) {
-      // Check for timeout
-      if (Date.now() - startTime > MAX_EXECUTION_TIME) {
-        console.warn('Execution time limit reached. Stopping updates.');
-        break;
-      }
-
       const characterId = Number(char.character_id);
       const characterName = String(char.character_name);
       const currentTotalValue = Number(char.total_value) || 0;
