@@ -54,15 +54,6 @@ export function getDatabase() {
       )
     `);
 
-    // Check if last_kill_id column exists (migration for existing DBs)
-    db.execute("PRAGMA table_info(leaderboard)").then((result) => {
-      const columns = result.rows.map(row => row.name);
-      if (!columns.includes('last_kill_id')) {
-        console.log("Migrating database: Adding last_kill_id column");
-        db?.execute("ALTER TABLE leaderboard ADD COLUMN last_kill_id INTEGER");
-      }
-    });
-
     console.log("Database initialized successfully");
 
     // Enable WAL mode for better concurrency
@@ -85,6 +76,28 @@ export function getDatabase() {
   }
   
   return db;
+}
+
+// Helper to ensure schema migration is complete
+export async function ensureDatabaseSchema() {
+  const db = getDatabase();
+
+  // Check if last_kill_id column exists (migration for existing DBs)
+  try {
+    const result = await db.execute("PRAGMA table_info(leaderboard)");
+    const columns = result.rows.map(row => row.name);
+
+    if (!columns.includes('last_kill_id')) {
+      console.log("Migrating database: Adding last_kill_id column");
+      await db.execute("ALTER TABLE leaderboard ADD COLUMN last_kill_id INTEGER");
+      console.log("Migration complete.");
+    }
+  } catch (error) {
+    console.error("Database migration check failed:", error);
+    // We don't throw here to avoid crashing if it's just a transient issue,
+    // but in a real scenario we might want to halt.
+    throw error;
+  }
 }
 
 // Don't initialize immediately - only when needed

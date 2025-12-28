@@ -11,7 +11,7 @@ async function fetchWithRateLimit(url: string) {
       'User-Agent': USER_AGENT,
       'Accept': 'application/json',
     },
-    // cache: 'no-store', // Removed to allow caching
+    cache: 'no-store',
     signal: AbortSignal.timeout(15000),
   });
   return response;

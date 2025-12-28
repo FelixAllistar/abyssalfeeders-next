@@ -1,4 +1,4 @@
-import { getDatabase } from './database';
+import { getDatabase, ensureDatabaseSchema } from './database';
 import { ABYSSAL_REGION_IDS, getRegionKills, getCharacterAbyssalKills } from './zkillboard';
 import { getKillmailDetails } from './esi';
 
@@ -19,6 +19,7 @@ async function fetchKillmailDetails(killmailId: number, hash: string) {
 }
 
 export async function scanAbyssalRegions() {
+  await ensureDatabaseSchema();
   const db = getDatabase();
   console.log('Starting scan of Abyssal regions...');
 

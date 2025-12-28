@@ -1,4 +1,4 @@
-import { getDatabase } from './database';
+import { getDatabase, ensureDatabaseSchema } from './database';
 import { getCharacterAbyssalKills } from './zkillboard';
 
 async function sleep(ms: number) {
@@ -6,6 +6,7 @@ async function sleep(ms: number) {
 }
 
 export async function updateAllCharacters() {
+  await ensureDatabaseSchema();
   const db = getDatabase();
   console.log('Starting daily update of all characters...');
 
