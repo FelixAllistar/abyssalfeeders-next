@@ -56,3 +56,30 @@ export async function getCharacterAbyssalKills(characterId: number) {
     killmails: allKillmails // Optional: return if needed, though we primarily need totalValue
   };
 }
+
+export const ABYSSAL_REGION_IDS = [
+  12000001,
+  12000002,
+  12000003,
+  12000004,
+  12000005
+];
+
+export async function getRegionKills(regionId: number, page: number = 1) {
+  const url = `https://zkillboard.com/api/regionID/${regionId}/page/${page}/`;
+  console.log(`Fetching region ${regionId} page ${page} from: ${url}`);
+
+  const response = await fetchWithRateLimit(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch region ${regionId} page ${page}: ${response.status} ${response.statusText}`);
+  }
+
+  const killmails = await response.json();
+
+  if (!Array.isArray(killmails)) {
+    throw new Error(`Unexpected response format for region ${regionId} page ${page}: expected array`);
+  }
+
+  return killmails;
+}
