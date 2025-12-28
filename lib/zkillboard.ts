@@ -9,9 +9,10 @@ async function fetchWithRateLimit(url: string) {
   const response = await fetch(url, {
     headers: {
       'User-Agent': USER_AGENT,
-      'Accept-Encoding': 'gzip',
       'Accept': 'application/json',
-    }
+    },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(15000),
   });
   return response;
 }
@@ -31,7 +32,13 @@ export async function getCharacterAbyssalKills(characterId: number) {
       throw new Error(`Failed to fetch page ${page}: ${response.status} ${response.statusText}`);
     }
 
-    const pageKillmails = await response.json();
+    let pageKillmails;
+    try {
+      pageKillmails = await response.json();
+    } catch (e) {
+      console.error(`Failed to parse JSON from ${url}`);
+      throw new Error(`Failed to parse JSON from ${url}: ${e}`);
+    }
 
     if (!Array.isArray(pageKillmails)) {
       throw new Error(`Unexpected response format for page ${page}: expected array`);
@@ -75,7 +82,13 @@ export async function getRegionKills(regionId: number, page: number = 1) {
     throw new Error(`Failed to fetch region ${regionId} page ${page}: ${response.status} ${response.statusText}`);
   }
 
-  const killmails = await response.json();
+  let killmails;
+  try {
+    killmails = await response.json();
+  } catch (e) {
+    console.error(`Failed to parse JSON from ${url}`);
+    throw new Error(`Failed to parse JSON from ${url}: ${e}`);
+  }
 
   if (!Array.isArray(killmails)) {
     throw new Error(`Unexpected response format for region ${regionId} page ${page}: expected array`);

@@ -5,9 +5,10 @@ async function fetchWithRateLimit(url: string) {
   const response = await fetch(url, {
     headers: {
       'User-Agent': USER_AGENT,
-      'Accept-Encoding': 'gzip',
       'Accept': 'application/json',
-    }
+    },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(15000),
   });
   return response;
 }
@@ -20,5 +21,10 @@ export async function getKillmailDetails(killmailId: number, hash: string) {
     throw new Error(`Failed to fetch killmail ${killmailId}: ${response.status} ${response.statusText}`);
   }
 
-  return response.json();
+  try {
+    return await response.json();
+  } catch (e) {
+    console.error(`Failed to parse JSON for killmail ${killmailId} from ${url}`);
+    throw new Error(`Failed to parse JSON: ${e}`);
+  }
 }
