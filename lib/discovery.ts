@@ -1,4 +1,4 @@
-import { getDatabase } from './database';
+import { getDatabase, ensureDatabaseSchema } from './database';
 import { ABYSSAL_REGION_IDS, getRegionKills, getCharacterAbyssalKills } from './zkillboard';
 import { getKillmailDetails } from './esi';
 
@@ -19,6 +19,7 @@ async function fetchKillmailDetails(killmailId: number, hash: string) {
 }
 
 export async function scanAbyssalRegions() {
+  await ensureDatabaseSchema();
   const db = getDatabase();
   console.log('Starting scan of Abyssal regions...');
 
@@ -75,12 +76,12 @@ export async function scanAbyssalRegions() {
 
             if (name) {
                 try {
-                    const { totalValue } = await getCharacterAbyssalKills(victimId);
+                    const { totalValue, latestKillId } = await getCharacterAbyssalKills(victimId);
 
                     await db.execute({
-                        sql: `INSERT INTO leaderboard (character_id, character_name, total_value, last_updated)
-                              VALUES (?, ?, ?, datetime('now'))`,
-                        args: [victimId, name, totalValue]
+                        sql: `INSERT INTO leaderboard (character_id, character_name, total_value, last_updated, last_kill_id)
+                              VALUES (?, ?, ?, datetime('now'), ?)`,
+                        args: [victimId, name, totalValue, latestKillId]
                     });
 
                     console.log(`Added ${name} (${victimId}) to leaderboard.`);
