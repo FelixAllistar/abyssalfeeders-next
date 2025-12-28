@@ -11,16 +11,17 @@ async function fetchWithRateLimit(url: string) {
       'User-Agent': USER_AGENT,
       'Accept': 'application/json',
     },
-    cache: 'no-store',
+    // cache: 'no-store', // Removed to allow caching
     signal: AbortSignal.timeout(15000),
   });
   return response;
 }
 
-export async function getCharacterAbyssalKills(characterId: number) {
-  const allKillmails = [];
+export async function getCharacterAbyssalKills(characterId: number, afterKillId?: number) {
+  const newKillmails = [];
   let page = 1;
   let hasMorePages = true;
+  let latestKillId = 0;
 
   while (hasMorePages) {
     const url = `https://zkillboard.com/api/characterID/${characterId}/abyssal/page/${page}/`;
@@ -32,9 +33,9 @@ export async function getCharacterAbyssalKills(characterId: number) {
       throw new Error(`Failed to fetch page ${page}: ${response.status} ${response.statusText}`);
     }
 
-    let pageKillmails;
+    let pageKillmails: { killmail_id: number; zkb?: { totalValue: number } }[];
     try {
-      pageKillmails = await response.json();
+      pageKillmails = await response.json() as { killmail_id: number; zkb?: { totalValue: number } }[];
     } catch (e) {
       console.error(`Failed to parse JSON from ${url}`);
       throw new Error(`Failed to parse JSON from ${url}: ${e}`);
@@ -44,23 +45,46 @@ export async function getCharacterAbyssalKills(characterId: number) {
       throw new Error(`Unexpected response format for page ${page}: expected array`);
     }
 
-    if (pageKillmails.length === 0 || pageKillmails.length < 200) {
-      allKillmails.push(...pageKillmails);
-      hasMorePages = false;
-    } else {
-      allKillmails.push(...pageKillmails);
-      page++;
-      // Sleep 1 second between pages to respect rate limits
-      await sleep(1000);
+    // Capture the latest kill ID from the first page
+    if (page === 1 && pageKillmails.length > 0) {
+      latestKillId = pageKillmails[0].killmail_id;
+    }
+
+    // Filter kills if afterKillId is provided
+    let killsToAdd = pageKillmails;
+    if (afterKillId) {
+      const cutoffIndex = pageKillmails.findIndex(k => k.killmail_id <= afterKillId);
+      if (cutoffIndex !== -1) {
+        // We found a kill that we've already seen (or older).
+        // Take everything before it.
+        killsToAdd = pageKillmails.slice(0, cutoffIndex);
+        hasMorePages = false; // Stop fetching further pages
+      }
+    }
+
+    newKillmails.push(...killsToAdd);
+
+    // If we stopped early due to afterKillId, we are done.
+    // Otherwise, check if we need to fetch the next page.
+    if (hasMorePages) {
+      if (pageKillmails.length < 200) {
+        // End of list reached
+        hasMorePages = false;
+      } else {
+        page++;
+        // Sleep 1 second between pages to respect rate limits
+        await sleep(1000);
+      }
     }
   }
 
-  const totalValue = allKillmails.reduce((sum, killmail) => sum + (killmail.zkb?.totalValue || 0), 0);
+  const totalValue = newKillmails.reduce((sum, killmail) => sum + (killmail.zkb?.totalValue || 0), 0);
 
   return {
     totalValue,
-    killmailCount: allKillmails.length,
-    killmails: allKillmails // Optional: return if needed, though we primarily need totalValue
+    killmailCount: newKillmails.length,
+    killmails: newKillmails,
+    latestKillId
   };
 }
 

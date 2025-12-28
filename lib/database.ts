@@ -49,9 +49,19 @@ export function getDatabase() {
         last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
         image_data BLOB,
         image_content_type TEXT,
-        image_fetched_at DATETIME
+        image_fetched_at DATETIME,
+        last_kill_id INTEGER
       )
     `);
+
+    // Check if last_kill_id column exists (migration for existing DBs)
+    db.execute("PRAGMA table_info(leaderboard)").then((result) => {
+      const columns = result.rows.map(row => row.name);
+      if (!columns.includes('last_kill_id')) {
+        console.log("Migrating database: Adding last_kill_id column");
+        db?.execute("ALTER TABLE leaderboard ADD COLUMN last_kill_id INTEGER");
+      }
+    });
 
     console.log("Database initialized successfully");
 
