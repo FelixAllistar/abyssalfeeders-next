@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const { characterId, characterName } = await request.json();
 
     // Fetch killmail data from Zkillboard with pagination
-    const { totalValue, killmailCount } = await getCharacterAbyssalKills(characterId);
+    const { totalValue, killmailCount, latestKillId } = await getCharacterAbyssalKills(characterId);
 
     // Reject characters with zero killmail value
     if (totalValue === 0) {
@@ -17,33 +17,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch and cache character portrait
-    let imageData = null;
-    let imageContentType = null;
-    const imageFetchedAt = new Date().toISOString();
-    try {
-      const imageUrl = `https://images.evetech.net/characters/${characterId}/portrait?tenant=tranquility&size=64`;
-      const imageResponse = await fetch(imageUrl);
-      if (imageResponse.ok) {
-        const arrayBuffer = await imageResponse.arrayBuffer();
-        imageData = Buffer.from(arrayBuffer);
-        imageContentType = imageResponse.headers.get('content-type') || 'image/jpeg';
-      }
-    } catch (e) {
-      console.error('Image fetch error:', e);
-    }
-
     const db = getDatabase();
     await db.execute({
-      sql: `INSERT INTO leaderboard (character_id, character_name, total_value, last_updated, image_data, image_content_type, image_fetched_at)
-            VALUES (?, ?, ?, datetime('now'), ?, ?, ?)
+      sql: `INSERT INTO leaderboard (character_id, character_name, total_value, last_updated, last_kill_id)
+            VALUES (?, ?, ?, datetime('now'), ?)
             ON CONFLICT(character_id) DO UPDATE SET
             total_value = excluded.total_value,
             last_updated = excluded.last_updated,
-            image_data = excluded.image_data,
-            image_content_type = excluded.image_content_type,
-            image_fetched_at = excluded.image_fetched_at`,
-      args: [characterId, characterName, totalValue, imageData, imageContentType, imageFetchedAt]
+            last_kill_id = excluded.last_kill_id`,
+      args: [characterId, characterName, totalValue, latestKillId]
     });
 
     return NextResponse.json({
