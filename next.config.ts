@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
         port: '3000',
         pathname: '/api/character-image/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.evetech.net',
+        port: '',
+        pathname: '/characters/**',
+      },
     ],
   },
 };
