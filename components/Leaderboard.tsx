@@ -117,7 +117,7 @@ export function Leaderboard({ refreshTrigger }: LeaderboardProps) {
                       'border-primary/30'
                   }`}>
                   <Image
-                    src={`/api/character-image/${entry.character_id}`}
+                    src={`https://images.evetech.net/characters/${entry.character_id}/portrait?tenant=tranquility&size=64`}
                     alt={`${entry.character_name} portrait`}
                     width={64}
                     height={64}

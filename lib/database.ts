@@ -47,9 +47,6 @@ export function getDatabase() {
         character_name TEXT,
         total_value INTEGER,
         last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
-        image_data BLOB,
-        image_content_type TEXT,
-        image_fetched_at DATETIME,
         last_kill_id INTEGER
       )
     `);
