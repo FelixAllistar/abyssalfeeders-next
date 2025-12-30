@@ -5,6 +5,39 @@ async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+export async function updateCharacter(
+  characterId: number,
+  characterName: string,
+  currentTotalValue: number,
+  lastKillId: number
+) {
+  try {
+    const { totalValue: newKillsValue, latestKillId } = await getCharacterAbyssalKills(characterId, lastKillId);
+
+    let newTotalValue;
+    if (lastKillId === 0) {
+      newTotalValue = newKillsValue;
+    } else {
+      newTotalValue = currentTotalValue + newKillsValue;
+    }
+
+    const newLastKillId = latestKillId > lastKillId ? latestKillId : lastKillId;
+
+    const db = getDatabase();
+    await db.execute({
+      sql: `UPDATE leaderboard
+            SET total_value = ?, last_updated = datetime('now'), last_kill_id = ?
+            WHERE character_id = ?`,
+      args: [newTotalValue, newLastKillId, characterId]
+    });
+
+    return { success: true, newTotalValue, newLastKillId };
+  } catch (err) {
+    console.error(`Failed to update character ${characterName} (${characterId}):`, err);
+    throw err;
+  }
+}
+
 export async function updateAllCharacters() {
   await ensureDatabaseSchema();
   const db = getDatabase();
@@ -23,46 +56,16 @@ export async function updateAllCharacters() {
       const characterId = Number(char.character_id);
       const characterName = String(char.character_name);
       const currentTotalValue = Number(char.total_value) || 0;
-      // Handle missing last_kill_id (e.g. from before migration) by defaulting to 0
       const lastKillId = Number(char.last_kill_id) || 0;
 
       console.log(`Updating ${characterName} (${characterId})...`);
 
       try {
-        const { totalValue: newKillsValue, latestKillId } = await getCharacterAbyssalKills(characterId, lastKillId);
-
-        // Only update if there are new kills or if we need to set the initial last_kill_id
-        // (latestKillId will be > 0 if we fetched anything, or at least equal to lastKillId if no new kills but valid response)
-
-        // CORRECTION: If lastKillId was 0 (or null/missing), we performed a FULL fetch.
-        // In that case, newKillsValue represents the TOTAL value of the character.
-        // We should overwrite existing total_value, not add to it.
-        // If lastKillId > 0, we performed an incremental fetch, so we add.
-
-        let newTotalValue;
-        if (lastKillId === 0) {
-            newTotalValue = newKillsValue;
-        } else {
-            newTotalValue = currentTotalValue + newKillsValue;
-        }
-
-        // Use the new latest kill ID, or keep the old one if we didn't find a newer one (shouldn't happen if logic is correct, but safe fallback)
-        const newLastKillId = latestKillId > lastKillId ? latestKillId : lastKillId;
-
-        // Update database
-        await db.execute({
-          sql: `UPDATE leaderboard
-                SET total_value = ?, last_updated = datetime('now'), last_kill_id = ?
-                WHERE character_id = ?`,
-          args: [newTotalValue, newLastKillId, characterId]
-        });
-
+        await updateCharacter(characterId, characterName, currentTotalValue, lastKillId);
         updatedCount++;
         // Sleep 2 seconds between characters to respect rate limits
         await sleep(2000);
-
       } catch (err) {
-        console.error(`Failed to update character ${characterName} (${characterId}):`, err);
         errorCount++;
       }
     }

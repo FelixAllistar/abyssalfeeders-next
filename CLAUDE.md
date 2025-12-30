@@ -32,7 +32,7 @@ Single table `leaderboard` with:
 - Updates/inserts character data in database
 
 #### `/api/leaderboard` (GET)
-- Returns top 50 characters by total killmail value
+- Returns top 100 characters by total killmail value
 - Ordered by `total_value` DESC
 
 #### `/api/character-image/[charId]` (GET)
