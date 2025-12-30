@@ -65,7 +65,7 @@ export async function updateAllCharacters() {
         updatedCount++;
         // Sleep 2 seconds between characters to respect rate limits
         await sleep(2000);
-      } catch (err) {
+      } catch {
         errorCount++;
       }
     }
