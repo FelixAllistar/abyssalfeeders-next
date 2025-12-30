@@ -8,12 +8,12 @@ const getDbPath = () => {
   if (process.env.DATABASE_PATH) {
     return process.env.DATABASE_PATH;
   }
-  
+
   // For development, always use local file to avoid permission issues
   if (process.env.NODE_ENV === 'development') {
     return path.join(process.cwd(), 'leaderboard.db');
   }
-  
+
   // Check if /data directory exists (Docker environment)
   try {
     if (fs.existsSync('/data')) {
@@ -22,7 +22,7 @@ const getDbPath = () => {
   } catch {
     // Fallback to local file
   }
-  
+
   // Local development fallback
   return path.join(process.cwd(), 'leaderboard.db');
 };
@@ -39,22 +39,9 @@ export function getDatabase() {
       url: `file:${dbPath}`
     });
 
-    // Create leaderboard table and add columns if they don't exist
-    db.execute(`
-      CREATE TABLE IF NOT EXISTS leaderboard (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        character_id INTEGER UNIQUE,
-        character_name TEXT,
-        total_value INTEGER,
-        last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
-        last_kill_id INTEGER
-      )
-    `);
-
-    console.log("Database initialized successfully");
-
     // Enable WAL mode for better concurrency
-    db.execute('PRAGMA journal_mode = WAL');
+    // ensureDatabaseSchema should be awaited before using the db
+
 
     // Close database on process exit
     process.on('SIGINT', () => {
@@ -71,7 +58,7 @@ export function getDatabase() {
       process.exit(0);
     });
   }
-  
+
   return db;
 }
 
@@ -81,6 +68,21 @@ export async function ensureDatabaseSchema() {
 
   // Check for migrations
   try {
+    // Enable WAL mode for better concurrency
+    await db.execute('PRAGMA journal_mode = WAL');
+
+    // Create leaderboard table and add columns if they don't exist
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS leaderboard (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        character_id INTEGER UNIQUE,
+        character_name TEXT,
+        total_value INTEGER,
+        last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
+        last_kill_id INTEGER
+      )
+    `);
+
     const result = await db.execute("PRAGMA table_info(leaderboard)");
     const columns = result.rows.map(row => row.name);
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase } from '@/lib/database';
+import { getDatabase, ensureDatabaseSchema } from '@/lib/database';
 import { getCharacterAbyssalKills } from '@/lib/zkillboard';
 
 export async function POST(request: NextRequest) {
@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    await ensureDatabaseSchema();
     const db = getDatabase();
     await db.execute({
       sql: `INSERT INTO leaderboard (character_id, character_name, total_value, last_updated, last_kill_id)

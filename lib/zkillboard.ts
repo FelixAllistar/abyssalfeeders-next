@@ -14,7 +14,7 @@ async function fetchWithRateLimit(url: string) {
     // We allow caching here to respect zKillboard's headers and reduce load on their servers.
     // This means updates might be delayed by the cache duration (e.g. 1 hour),
     // but eventually consistency is maintained as long as a user doesn't get >200 kills in that window.
-    // cache: 'no-store',
+    cache: 'no-store',
     signal: AbortSignal.timeout(15000),
   });
   return response;

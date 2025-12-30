@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getDatabase } from '@/lib/database';
+import { getDatabase, ensureDatabaseSchema } from '@/lib/database';
 
 export async function GET() {
   try {
+    await ensureDatabaseSchema();
     const db = getDatabase();
     const result = await db.execute({
       sql: `SELECT character_id, character_name, total_value, last_updated
