@@ -39,6 +39,13 @@ export async function scanAbyssalRegions() {
 
       for (const kill of killsToProcess) {
         const { killmail_id, zkb } = kill;
+
+        // Skip kills with missing zkb data (sometimes zKillboard returns incomplete data)
+        if (!zkb?.hash) {
+          console.warn(`Skipping kill ${killmail_id}: missing zkb.hash`);
+          continue;
+        }
+
         const hash = zkb.hash;
 
         // Fetch full details from ESI
@@ -55,43 +62,43 @@ export async function scanAbyssalRegions() {
         if (newCharacters.has(victimId)) continue;
 
         const existing = await db.execute({
-            sql: 'SELECT 1 FROM leaderboard WHERE character_id = ?',
-            args: [victimId]
+          sql: 'SELECT 1 FROM leaderboard WHERE character_id = ?',
+          args: [victimId]
         });
 
         if (existing.rows.length === 0) {
-            // Character not in DB. Add them.
-            console.log(`Discovered new character: ${victimId}. Fetching stats...`);
+          // Character not in DB. Add them.
+          console.log(`Discovered new character: ${victimId}. Fetching stats...`);
 
-            // We need the character name.
-            // The killmail details usually have it, but sometimes it's not resolved if we used ESI directly?
-            // ESI killmail response has `victim.character_id`. It does NOT always have the name if it's just an ID.
-            // Wait, ESI killmail response usually has IDs.
-            // We might need to resolve the name.
-            // However, getCharacterAbyssalKills fetches from zKillboard, which doesn't return the name directly either unless we parse it.
-            // But usually we need the name for the leaderboard.
+          // We need the character name.
+          // The killmail details usually have it, but sometimes it's not resolved if we used ESI directly?
+          // ESI killmail response has `victim.character_id`. It does NOT always have the name if it's just an ID.
+          // Wait, ESI killmail response usually has IDs.
+          // We might need to resolve the name.
+          // However, getCharacterAbyssalKills fetches from zKillboard, which doesn't return the name directly either unless we parse it.
+          // But usually we need the name for the leaderboard.
 
-            // Let's try to get the name from ESI /characters/{id}/
-            const name = await getCharacterName(victimId);
+          // Let's try to get the name from ESI /characters/{id}/
+          const name = await getCharacterName(victimId);
 
-            if (name) {
-                try {
-                    const { totalValue, latestKillId } = await getCharacterAbyssalKills(victimId);
+          if (name) {
+            try {
+              const { totalValue, latestKillId } = await getCharacterAbyssalKills(victimId);
 
-                    await db.execute({
-                        sql: `INSERT INTO leaderboard (character_id, character_name, total_value, last_updated, last_kill_id)
+              await db.execute({
+                sql: `INSERT INTO leaderboard (character_id, character_name, total_value, last_updated, last_kill_id)
                               VALUES (?, ?, ?, datetime('now'), ?)`,
-                        args: [victimId, name, totalValue, latestKillId]
-                    });
+                args: [victimId, name, totalValue, latestKillId]
+              });
 
-                    console.log(`Added ${name} (${victimId}) to leaderboard.`);
-                    newCharacters.add(victimId);
-                    newCharactersCount++;
-                } catch (err) {
-                    console.error(`Failed to add character ${victimId}:`, err);
-                    errorCount++;
-                }
+              console.log(`Added ${name} (${victimId}) to leaderboard.`);
+              newCharacters.add(victimId);
+              newCharactersCount++;
+            } catch (err) {
+              console.error(`Failed to add character ${victimId}:`, err);
+              errorCount++;
             }
+          }
         }
       }
 
@@ -109,13 +116,13 @@ export async function scanAbyssalRegions() {
 }
 
 async function getCharacterName(characterId: number): Promise<string | null> {
-    try {
-        const response = await fetch(`https://esi.evetech.net/latest/characters/${characterId}/`);
-        if (!response.ok) return null;
-        const data = await response.json();
-        return data.name;
-    } catch (error) {
-        console.error(`Failed to fetch name for ${characterId}:`, error);
-        return null;
-    }
+  try {
+    const response = await fetch(`https://esi.evetech.net/latest/characters/${characterId}/`);
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.name;
+  } catch (error) {
+    console.error(`Failed to fetch name for ${characterId}:`, error);
+    return null;
+  }
 }
