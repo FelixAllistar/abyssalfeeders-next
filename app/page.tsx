@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CharacterSearch } from "@/components/CharacterSearch";
 import { CharacterIdInput } from "@/components/CharacterIdInput";
 import { Leaderboard } from "@/components/Leaderboard";
 import { ProcessingStatus } from "@/components/ProcessingStatus";
+import { AbyssalShader } from "@/components/AbyssalShader";
+import { motion, useMotionValue } from "framer-motion";
 
 interface Character {
   id: number;
@@ -26,6 +28,21 @@ export default function Home() {
   const [processingError, setProcessingError] = useState<string | undefined>();
   const [leaderboardRefresh, setLeaderboardRefresh] = useState(0);
   const [searchMethod, setSearchMethod] = useState<'search' | 'id'>('search');
+
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const { clientX, clientY } = e;
+      mouseX.set(clientX);
+      mouseY.set(clientY);
+      document.documentElement.style.setProperty('--mouse-x', `${clientX}px`);
+      document.documentElement.style.setProperty('--mouse-y', `${clientY}px`);
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
 
   const processCharacter = async (character: Character) => {
     setIsProcessing(true);
@@ -65,74 +82,93 @@ export default function Home() {
 
   return (
     <div className="container mx-auto p-4 relative z-10 min-h-screen flex flex-col">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent text-eve-title">
+      <AbyssalShader />
+
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-12 mt-8"
+      >
+        <h1 className="text-5xl md:text-6xl font-black mb-4 font-orbitron text-nanobana tracking-tighter uppercase italic">
           Abyssal Feederboard
         </h1>
-        <div className="w-24 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mt-2" />
-      </div>
+        <div className="w-48 h-1 bg-nanobana mx-auto shadow-[0_0_15px_rgba(255,230,0,0.5)]" />
+      </motion.div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
-        {/* Search Column - Smaller and more subtle */}
-        <div className="lg:col-span-1 xl:col-span-1">
-          <Card className="bg-card/40 backdrop-blur-sm border-border/30 shadow-lg transition-all duration-300 h-fit">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Add Character
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-7xl mx-auto w-full">
+        {/* Search Column */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="lg:col-span-3"
+        >
+          <Card className="glass-panel border-white/5 h-fit scanline">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-white/50 mb-4">
+                Character Sync
               </CardTitle>
-              <div className="flex bg-muted/30 rounded-md p-0.5 w-fit">
+              <div className="flex bg-white/5 rounded-lg p-1">
                 <Button
                   variant={searchMethod === 'search' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setSearchMethod('search')}
                   disabled={isProcessing}
-                  className="h-7 text-xs flex-1 rounded-r-none"
+                  className={`h-8 text-xs flex-1 rounded-md transition-all ${searchMethod === 'search' ? 'bg-nanobana text-black shadow-lg shadow-nanobana/20' : 'text-white/60 hover:text-white'}`}
                 >
-                  Name
+                  By Name
                 </Button>
                 <Button
                   variant={searchMethod === 'id' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setSearchMethod('id')}
                   disabled={isProcessing}
-                  className="h-7 text-xs flex-1 rounded-l-none"
+                  className={`h-8 text-xs flex-1 rounded-md transition-all ${searchMethod === 'id' ? 'bg-nanobana text-black shadow-lg shadow-nanobana/20' : 'text-white/60 hover:text-white'}`}
                 >
-                  ID
+                  By ID
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground/70 mt-2">
-                Note: Only pulls kills from Characters who have been authenticated on Zkillboard.com
-              </p>
             </CardHeader>
-            <CardContent className="pt-0">
-              {searchMethod === 'search' ? (
-                <CharacterSearch
-                  onCharacterSelect={processCharacter}
-                  isProcessing={isProcessing}
-                />
-              ) : (
-                <CharacterIdInput
-                  onCharacterLookup={processCharacter}
-                  isProcessing={isProcessing}
-                />
-              )}
+            <CardContent className="space-y-4">
+              <div className="bg-black/20 p-4 rounded-xl border border-white/5">
+                {searchMethod === 'search' ? (
+                  <CharacterSearch
+                    onCharacterSelect={processCharacter}
+                    isProcessing={isProcessing}
+                  />
+                ) : (
+                  <CharacterIdInput
+                    onCharacterLookup={processCharacter}
+                    isProcessing={isProcessing}
+                  />
+                )}
+              </div>
 
-              {/* Compact processing status within search card */}
-              <div className="mt-3">
+              <div className="mt-2">
                 <ProcessingStatus
                   isProcessing={isProcessing}
                   result={processingResult}
                   error={processingError}
                 />
               </div>
+
+              <p className="text-[10px] text-white/30 leading-relaxed bg-white/5 p-3 rounded-lg border border-white/5">
+                DATABASE: ZKILLBOARD.COM<br />
+                NOTE: AUTH REQ FOR LOSS DATA SYNC.
+              </p>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
 
-        {/* Leaderboard Column - Main focus, takes up most space */}
-        <div className="lg:col-span-3 xl:col-span-3">
+        {/* Leaderboard Column */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.4 }}
+          className="lg:col-span-9"
+        >
           <Leaderboard refreshTrigger={leaderboardRefresh} />
-        </div>
+        </motion.div>
       </div>
     </div>
   );

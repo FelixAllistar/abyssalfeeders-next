@@ -1,424 +1,91 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@theme {
+  --color-nanobana: #FFE600;
+  --color-nanobana-glow: rgba(255, 230, 0, 0.4);
+
+  --font-inter: var(--font-inter);
+  --font-orbitron: var(--font-orbitron);
+
+  --radius-lg: 0.75rem;
+  --radius-md: calc(0.75rem - 2px);
+  --radius-sm: calc(0.75rem - 4px);
+}
 
 :root {
-  /* EVE Online Space Theme - Light Mode */
-  --background: hsl(220 20% 8%);
-  --foreground: hsl(200 15% 85%);
-  --card: hsl(220 25% 12%);
-  --card-foreground: hsl(200 15% 85%);
-  --popover: hsl(220 25% 12%);
-  --popover-foreground: hsl(200 15% 85%);
-  --primary: hsl(190 80% 40%);
-  --primary-foreground: hsl(220 20% 8%);
-  --secondary: hsl(220 15% 15%);
-  --secondary-foreground: hsl(200 15% 85%);
-  --muted: hsl(220 15% 15%);
-  --muted-foreground: hsl(200 8% 60%);
-  --accent: hsl(45 90% 55%);
-  --accent-foreground: hsl(220 20% 8%);
-  --destructive: hsl(0 70% 50%);
-  --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(220 15% 20%);
-  --input: hsl(220 15% 15%);
-  --ring: hsl(190 80% 40%);
-  --chart-1: hsl(190 80% 40%);
-  --chart-2: hsl(45 90% 55%);
-  --chart-3: hsl(280 70% 60%);
-  --chart-4: hsl(120 60% 50%);
-  --chart-5: hsl(0 70% 50%);
-  --radius: 0.6rem;
-  --sidebar-background: hsl(220 25% 10%);
-  --sidebar-foreground: hsl(200 15% 85%);
-  --sidebar-primary: hsl(190 80% 40%);
-  --sidebar-primary-foreground: hsl(220 20% 8%);
-  --sidebar-accent: hsl(220 15% 15%);
-  --sidebar-accent-foreground: hsl(200 15% 85%);
-  --sidebar-border: hsl(220 15% 20%);
-  --sidebar-ring: hsl(190 80% 40%);
-}
-
-.dark {
-  /* EVE Online Space Theme - Dark Mode (Deeper Space) */
-  --background: hsl(220 30% 4%);
-  --foreground: hsl(200 20% 90%);
-  --card: hsl(220 35% 6%);
-  --card-foreground: hsl(200 20% 90%);
-  --popover: hsl(220 35% 6%);
-  --popover-foreground: hsl(200 20% 90%);
-  --primary: hsl(190 85% 45%);
-  --primary-foreground: hsl(220 30% 4%);
-  --secondary: hsl(220 25% 8%);
-  --secondary-foreground: hsl(200 20% 90%);
-  --muted: hsl(220 25% 8%);
-  --muted-foreground: hsl(200 10% 65%);
-  --accent: hsl(45 95% 60%);
-  --accent-foreground: hsl(220 30% 4%);
-  --destructive: hsl(0 75% 55%);
-  --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(220 20% 12%);
-  --input: hsl(220 25% 8%);
-  --ring: hsl(190 85% 45%);
-  --chart-1: hsl(190 85% 45%);
-  --chart-2: hsl(45 95% 60%);
-  --chart-3: hsl(280 75% 65%);
-  --chart-4: hsl(120 65% 55%);
-  --chart-5: hsl(0 75% 55%);
-  --sidebar-background: hsl(220 35% 5%);
-  --sidebar-foreground: hsl(200 20% 90%);
-  --sidebar-primary: hsl(190 85% 45%);
-  --sidebar-primary-foreground: hsl(220 30% 4%);
-  --sidebar-accent: hsl(220 25% 8%);
-  --sidebar-accent-foreground: hsl(200 20% 90%);
-  --sidebar-border: hsl(220 20% 12%);
-  --sidebar-ring: hsl(190 85% 45%);
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar-background);
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
-
-  @keyframes accordion-down {
-    from {
-      height: 0;
-    }
-    to {
-      height: var(--radix-accordion-content-height);
-    }
-  }
-
-  @keyframes accordion-up {
-    from {
-      height: var(--radix-accordion-content-height);
-    }
-    to {
-      height: 0;
-    }
-  }
+  --background: #030304;
+  --foreground: #ffffff;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: rgba(255, 255, 255, 0.1);
   }
-  
+
   body {
-    @apply bg-background text-foreground grid place-items-center min-w-[320px] min-h-screen relative m-0;
+    background-color: var(--background);
+    color: var(--foreground);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    margin: 0;
     font-family: var(--font-inter), system-ui, sans-serif;
   }
-  
-  /* Orbitron font for EVE-specific elements */
+}
+
+@layer components {
   .font-orbitron {
     font-family: var(--font-orbitron), monospace;
   }
-  
-  /* Typography scale */
-  .text-eve-title {
+
+  .glass-panel {
+    background-color: rgba(10, 10, 12, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    background-image:
+      radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 230, 0, 0.08) 0%, transparent 60%),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03), transparent);
+  }
+
+  .text-nanobana {
+    color: #FFE600;
     font-family: var(--font-orbitron), monospace;
-    font-weight: 700;
-    letter-spacing: 0.05em;
+    filter: drop-shadow(0 0 8px rgba(255, 230, 0, 0.5));
   }
-  
-  .text-eve-heading {
-    font-family: var(--font-orbitron), monospace;
-    font-weight: 500;
-    letter-spacing: 0.025em;
-  }
-  
-  .text-eve-value {
-    font-family: var(--font-orbitron), monospace;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-  }
-  
-  .text-eve-label {
-    font-family: var(--font-orbitron), monospace;
-    font-weight: 400;
-    letter-spacing: 0.01em;
-  }
-}
 
-/* Space-themed starfield background */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: 
-    /* Random scattered stars of different sizes and brightness */
-    radial-gradient(1px 1px at 2% 10%, rgba(255, 255, 255, 0.9), transparent),
-    radial-gradient(1px 1px at 8% 25%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(2px 2px at 15% 40%, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(1px 1px at 22% 15%, rgba(255, 255, 255, 0.7), transparent),
-    radial-gradient(1px 1px at 35% 60%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(2px 2px at 42% 30%, rgba(255, 255, 255, 0.9), transparent),
-    radial-gradient(1px 1px at 48% 75%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 55% 45%, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(2px 2px at 65% 20%, rgba(255, 255, 255, 0.7), transparent),
-    radial-gradient(1px 1px at 72% 80%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 78% 50%, rgba(255, 255, 255, 0.9), transparent),
-    radial-gradient(2px 2px at 85% 70%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 92% 35%, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(1px 1px at 18% 85%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(2px 2px at 28% 5%, rgba(255, 255, 255, 0.7), transparent),
-    radial-gradient(1px 1px at 38% 95%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 62% 8%, rgba(255, 255, 255, 0.9), transparent),
-    radial-gradient(2px 2px at 88% 92%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 12% 55%, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(1px 1px at 95% 65%, rgba(255, 255, 255, 0.4), transparent),
-    /* Additional smaller stars */
-    radial-gradient(0.5px 0.5px at 5% 45%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(0.5px 0.5px at 25% 80%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(0.5px 0.5px at 45% 25%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(0.5px 0.5px at 65% 90%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(0.5px 0.5px at 85% 15%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(0.5px 0.5px at 95% 45%, rgba(255, 255, 255, 0.4), transparent),
-    /* More dense star field */
-    radial-gradient(0.5px 0.5px at 10% 70%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(1px 1px at 17% 32%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(0.5px 0.5px at 26% 48%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 33% 73%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(0.5px 0.5px at 41% 18%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(1px 1px at 49% 92%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(0.5px 0.5px at 57% 38%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 64% 63%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(0.5px 0.5px at 73% 28%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(1px 1px at 81% 88%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(0.5px 0.5px at 89% 52%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 97% 77%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(0.5px 0.5px at 6% 22%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(1px 1px at 14% 58%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(0.5px 0.5px at 31% 83%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 39% 13%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(0.5px 0.5px at 46% 67%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(1px 1px at 53% 42%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(0.5px 0.5px at 61% 98%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 68% 27%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(0.5px 0.5px at 76% 72%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(1px 1px at 84% 47%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(0.5px 0.5px at 91% 12%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 3% 87%, rgba(255, 255, 255, 0.6), transparent);
-  animation: starfield 120s linear infinite;
-  pointer-events: none;
-}
-
-/* Nebula-like glow effect */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: 
-    radial-gradient(circle at 20% 20%, hsla(190, 80%, 40%, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, hsla(280, 70%, 60%, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 40% 60%, hsla(190, 60%, 50%, 0.04) 0%, transparent 50%);
-  animation: nebula 180s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes starfield {
-  from {
-    transform: translateY(0);
+  .scanline {
+    position: relative;
+    overflow: hidden;
   }
-  to {
-    transform: translateY(-100px);
-  }
-}
 
-@keyframes nebula {
-  0%, 100% {
-    opacity: 0.2;
-    transform: scale(1) rotate(0deg);
+  .scanline::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+        rgba(255, 230, 0, 0.01) 50%), linear-gradient(90deg,
+        rgba(255, 0, 0, 0.02),
+        rgba(0, 255, 0, 0.01),
+        rgba(0, 0, 255, 0.02));
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    z-index: 20;
+    opacity: 0.5;
   }
-  50% {
-    opacity: 0.4;
-    transform: scale(1.02) rotate(180deg);
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Subtle glow animation for interactive elements */
-@keyframes glow {
-  0%, 100% {
-    box-shadow: 0 0 5px hsl(190 80% 40% / 0.3);
-  }
-  50% {
-    box-shadow: 0 0 20px hsl(190 80% 40% / 0.6), 0 0 30px hsl(190 80% 40% / 0.4);
-  }
-}
-
-/* Pulsing animation for loading states */
-@keyframes pulse-glow {
-  0%, 100% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.02);
-  }
-}
-
-/* Shimmer effect for text gradients */
-@keyframes shimmer {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
-}
-
-/* Add glow effect to focus states */
-:focus-visible {
-  outline: 2px solid hsl(190 80% 40%);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px hsl(190 80% 40% / 0.2);
-}
-
-/* Enhanced button hover states */
-.btn-glow:hover {
-  animation: glow 2s ease-in-out infinite;
-}
-
-/* EVE Online themed rank effects */
-@keyframes champion-glow {
-  0%, 100% {
-    box-shadow: 
-      0 0 10px hsl(45 95% 60% / 0.6),
-      0 0 20px hsl(45 95% 60% / 0.4),
-      0 0 30px hsl(45 95% 60% / 0.2);
-  }
-  50% {
-    box-shadow: 
-      0 0 15px hsl(45 95% 60% / 0.8),
-      0 0 30px hsl(45 95% 60% / 0.6),
-      0 0 45px hsl(45 95% 60% / 0.3);
-  }
-}
-
-@keyframes elite-pulse {
-  0%, 100% {
-    box-shadow: 
-      0 0 8px hsl(190 85% 45% / 0.5),
-      0 0 16px hsl(190 85% 45% / 0.3);
-  }
-  50% {
-    box-shadow: 
-      0 0 12px hsl(190 85% 45% / 0.7),
-      0 0 24px hsl(190 85% 45% / 0.4);
-  }
-}
-
-@keyframes veteran-shimmer {
-  0%, 100% {
-    box-shadow: 
-      0 0 6px hsl(280 75% 65% / 0.4),
-      0 0 12px hsl(280 75% 65% / 0.2);
-  }
-  50% {
-    box-shadow: 
-      0 0 10px hsl(280 75% 65% / 0.6),
-      0 0 20px hsl(280 75% 65% / 0.3);
-  }
-}
-
-/* Special rank badges */
-.rank-champion {
-  animation: champion-glow 3s ease-in-out infinite;
-  position: relative;
-}
-
-.rank-champion::before {
-  content: "👑";
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  font-size: 16px;
-  z-index: 10;
-  filter: drop-shadow(0 0 4px hsl(45 95% 60%));
-}
-
-.rank-elite {
-  animation: elite-pulse 2.5s ease-in-out infinite;
-  position: relative;
-}
-
-.rank-elite::before {
-  content: "⚡";
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  font-size: 14px;
-  z-index: 10;
-  filter: drop-shadow(0 0 3px hsl(190 85% 45%));
-}
-
-.rank-veteran {
-  animation: veteran-shimmer 2s ease-in-out infinite;
-  position: relative;
-}
-
-.rank-veteran::before {
-  content: "⭐";
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  font-size: 12px;
-  z-index: 10;
-  filter: drop-shadow(0 0 2px hsl(280 75% 65%));
 }
 
 @media (prefers-reduced-motion) {
+
   *,
   ::before,
   ::after {
-    animation: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
