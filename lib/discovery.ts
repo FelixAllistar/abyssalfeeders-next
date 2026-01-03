@@ -38,11 +38,17 @@ export async function scanAbyssalRegions() {
       const killsToProcess = kills.slice(0, 50);
 
       for (const kill of killsToProcess) {
+        // Guard against null/undefined kill objects with logging
+        if (!kill || typeof kill !== 'object') {
+          console.error(`Discovery: Found null or non-object kill entry in region ${regionId}. Entry:`, kill);
+          continue;
+        }
+
         const { killmail_id, zkb } = kill;
 
         // Skip kills with missing zkb data (sometimes zKillboard returns incomplete data)
         if (!zkb?.hash) {
-          console.warn(`Skipping kill ${killmail_id}: missing zkb.hash`);
+          console.warn(`Discovery: Skipping kill ${killmail_id || 'unknown'} in region ${regionId}: missing zkb.hash. Full data:`, JSON.stringify(kill));
           continue;
         }
 
@@ -50,12 +56,17 @@ export async function scanAbyssalRegions() {
 
         // Fetch full details from ESI
         const details = await fetchKillmailDetails(killmail_id, hash);
-        if (!details) continue;
+        if (!details) {
+          console.warn(`Discovery: Failed to fetch ESI details for kill ${killmail_id} (hash: ${hash}) in region ${regionId}`);
+          continue;
+        }
 
         const victimId = details.victim?.character_id;
 
-        // Some kills might be structure kills or NPC kills without a character victim (unlikely in Abyss but possible)
-        if (!victimId) continue;
+        if (!victimId) {
+          console.log(`Discovery: Skipping kill ${killmail_id} in region ${regionId} - no character victimId (likely NPC or structure)`);
+          continue;
+        }
 
         // Check if character is already in DB
         // We use a local cache (Set) to avoid repeated DB lookups in this run
@@ -118,9 +129,16 @@ export async function scanAbyssalRegions() {
 async function getCharacterName(characterId: number): Promise<string | null> {
   try {
     const response = await fetch(`https://esi.evetech.net/latest/characters/${characterId}/`);
-    if (!response.ok) return null;
+    if (!response.ok) {
+      console.error(`ESI Name Lookup: Failed to fetch name for ${characterId}. Status: ${response.status} ${response.statusText}`);
+      return null;
+    }
     const data = await response.json();
-    return data.name;
+    if (!data || typeof data !== 'object') {
+      console.error(`ESI Name Lookup: Received invalid JSON for ${characterId}:`, data);
+      return null;
+    }
+    return data.name || null;
   } catch (error) {
     console.error(`Failed to fetch name for ${characterId}:`, error);
     return null;

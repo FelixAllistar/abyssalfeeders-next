@@ -27,7 +27,8 @@ export async function getCharacterAbyssalKills(characterId: number, afterKillId?
   let latestKillId = 0;
 
   while (hasMorePages) {
-    const url = `https://zkillboard.com/api/characterID/${characterId}/abyssal/page/${page}/`;
+    // Explicitly fetching losses to focus on ship destruction (feeder stats)
+    const url = `https://zkillboard.com/api/losses/characterID/${characterId}/abyssal/page/${page}/`;
     console.log(`Fetching page ${page} from: ${url}`);
 
     const response = await fetchWithRateLimit(url);
@@ -36,31 +37,52 @@ export async function getCharacterAbyssalKills(characterId: number, afterKillId?
       throw new Error(`Failed to fetch page ${page}: ${response.status} ${response.statusText}`);
     }
 
-    let pageKillmails: { killmail_id: number; zkb?: { totalValue: number } }[];
+    let pageKillmails: any[];
     try {
-      pageKillmails = await response.json() as { killmail_id: number; zkb?: { totalValue: number } }[];
+      pageKillmails = await response.json();
     } catch (e) {
       console.error(`Failed to parse JSON from ${url}`);
       throw new Error(`Failed to parse JSON from ${url}: ${e}`);
     }
 
     if (!Array.isArray(pageKillmails)) {
+      console.error(`Unexpected response format from ${url}. Received:`, typeof pageKillmails, pageKillmails);
       throw new Error(`Unexpected response format for page ${page}: expected array`);
     }
 
     // Capture the latest kill ID from the first page
-    if (page === 1 && pageKillmails.length > 0) {
-      latestKillId = pageKillmails[0].killmail_id;
+    if (page === 1) {
+      const firstValid = pageKillmails.find(k => k && typeof k === 'object' && k.killmail_id);
+      if (firstValid) {
+        latestKillId = firstValid.killmail_id;
+      } else if (pageKillmails.length > 0) {
+        console.warn(`Page 1 has ${pageKillmails.length} entries but no valid killmail_id found in first entry. First entry:`, pageKillmails[0]);
+      }
     }
 
-    // Filter kills if afterKillId is provided
-    let killsToAdd = pageKillmails;
-    if (afterKillId) {
-      const cutoffIndex = pageKillmails.findIndex(k => k.killmail_id <= afterKillId);
+    // Filter out any null/undefined entries with loud logging
+    let killsToAdd: { killmail_id: number; zkb?: { totalValue: number } }[] = [];
+
+    for (let i = 0; i < pageKillmails.length; i++) {
+      const k = pageKillmails[i];
+      if (k === null || typeof k !== 'object') {
+        console.error(`CRITICAL: Null or non-object entry found at index ${i} on page ${page} for character ${characterId}. URL: ${url}`);
+        continue;
+      }
+      if (typeof k.killmail_id !== 'number') {
+        console.error(`CRITICAL: Entry at index ${i} on page ${page} missing numeric killmail_id. Data:`, JSON.stringify(k));
+        continue;
+      }
+      killsToAdd.push(k);
+    }
+
+    // Filter kills if afterKillId is provided (only if > 0, as 0 means new character wanting full history)
+    if (afterKillId && afterKillId > 0) {
+      const cutoffIndex = killsToAdd.findIndex(k => k.killmail_id <= afterKillId);
       if (cutoffIndex !== -1) {
         // We found a kill that we've already seen (or older).
         // Take everything before it.
-        killsToAdd = pageKillmails.slice(0, cutoffIndex);
+        killsToAdd = killsToAdd.slice(0, cutoffIndex);
         hasMorePages = false; // Stop fetching further pages
       }
     }
@@ -81,7 +103,13 @@ export async function getCharacterAbyssalKills(characterId: number, afterKillId?
     }
   }
 
-  const totalValue = newKillmails.reduce((sum, killmail) => sum + (killmail.zkb?.totalValue || 0), 0);
+  const totalValue = newKillmails.reduce((sum, killmail) => {
+    if (!killmail?.zkb) {
+      console.warn(`Value Calculation: Kill ${killmail?.killmail_id} for character ${characterId} is missing 'zkb' property (price data). Full data:`, JSON.stringify(killmail));
+      return sum;
+    }
+    return sum + (killmail.zkb.totalValue || 0);
+  }, 0);
 
   return {
     totalValue,
